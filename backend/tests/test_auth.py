@@ -67,3 +67,23 @@ def test_me_with_invalid_token_rejected(client):
     response = client.get("/auth/me", headers={"Authorization": "Bearer garbage"})
 
     assert response.status_code == 401
+
+
+def test_register_with_short_password_rejected(client):
+    response = register(client, password="short")
+
+    assert response.status_code == 422
+
+
+def test_login_is_rate_limited(client):
+    responses = [login(client, email="nobody@example.com") for _ in range(11)]
+
+    assert responses[-1].status_code == 429
+
+
+def test_register_is_rate_limited(client):
+    responses = [
+        register(client, email=f"limit{i}@example.com") for i in range(11)
+    ]
+
+    assert responses[-1].status_code == 429
