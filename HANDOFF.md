@@ -84,9 +84,7 @@ curl -X POST $BASE/auth/register -H "Content-Type: application/json" \
 
 ## Pendientes conocidos (no bloqueantes)
 
-- **Favicon**: falta, da 404 cosmético en consola. Agregar `frontend/src/app/favicon.ico` y redesplegar.
 - **Cold start**: el backend en el plan free de Render se duerme tras inactividad — el primer request tras un rato puede tardar ~30s.
-- **`frontend/src/lib/auth.ts`**: archivo muerto (ya no se usa, quedó del localStorage viejo). Se puede borrar sin riesgo.
 - **Vercel sin Git conectado**: ver sección de deploy arriba — considerar conectar el repo si vas a seguir iterando.
 - **Multi-moneda / roles de equipo**: fuera de alcance del MVP, mencionado en la idea original pero no implementado.
 
@@ -95,5 +93,7 @@ curl -X POST $BASE/auth/register -H "Content-Type: application/json" \
 - JWT_SECRET obligatorio (sin default inseguro)
 - Rate limiting en login/register (10/min por IP)
 - Password mínimo 8 caracteres validado en backend
-- Token en cookie `httpOnly` (no localStorage, protegido contra robo vía XSS)
+- Token en cookie `httpOnly` (no localStorage, protegido contra robo vía XSS; se eliminó `frontend/src/lib/auth.ts`, que guardaba una copia redundante en localStorage)
 - CORS restringido a orígenes explícitos vía env var
+- Validación de longitud/rango en los schemas de propiedades, ingresos y gastos (montos no negativos, strings acotados)
+- Guard de Origin en `/auth/login` y `/auth/logout` contra CSRF (únicos endpoints "simple request" que el preflight de CORS no cubre)

@@ -75,8 +75,10 @@ export default function NewPropertyPage() {
               <Input
                 id="currency"
                 required
+                maxLength={3}
+                placeholder="USD"
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
+                onChange={(e) => setCurrency(e.target.value.toUpperCase())}
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}

@@ -10,6 +10,9 @@ export class ApiError extends Error {
 async function parseError(response: Response): Promise<string> {
   try {
     const data = await response.json();
+    if (Array.isArray(data.detail)) {
+      return data.detail.map((e: { msg?: string }) => e.msg).filter(Boolean).join("; ");
+    }
     return data.detail ?? "Request failed";
   } catch {
     return "Request failed";

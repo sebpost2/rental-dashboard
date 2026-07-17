@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import { AppHeader } from "@/components/AppHeader";
 import { RooflineIcon } from "@/components/RooflineIcon";
+import { formatExpenseCategory } from "@/lib/format";
 
 export default function PropertyDetailPage() {
   const user = useAuthGuard();
@@ -219,12 +220,14 @@ export default function PropertyDetailPage() {
                   onValueChange={(v) => setExpenseCategory(v as ExpenseCategory)}
                 >
                   <SelectTrigger id="expense-category">
-                    <SelectValue />
+                    <SelectValue>
+                      {(value: ExpenseCategory) => formatExpenseCategory(value)}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {EXPENSE_CATEGORIES.map((c) => (
                       <SelectItem key={c} value={c}>
-                        {c}
+                        {formatExpenseCategory(c)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -249,7 +252,7 @@ export default function PropertyDetailPage() {
                   <TableRow key={e.id}>
                     <TableCell className="font-mono tabular-nums">{e.date}</TableCell>
                     <TableCell className="font-mono tabular-nums">{e.amount}</TableCell>
-                    <TableCell>{e.category}</TableCell>
+                    <TableCell>{formatExpenseCategory(e.category)}</TableCell>
                     <TableCell>
                       <Button
                         variant="destructive"
