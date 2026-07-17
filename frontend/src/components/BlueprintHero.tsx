@@ -9,7 +9,7 @@ export function BlueprintHero() {
           <span className="h-px w-6 bg-paper/30" />
           <span>Elevación frontal</span>
         </span>
-        <span className="hidden text-paper/35 sm:inline">Mueve el cursor para girar</span>
+        <span className="hidden text-paper/35 sm:inline">Arrastra para girar el modelo</span>
       </div>
 
       <BlueprintHouse3D />

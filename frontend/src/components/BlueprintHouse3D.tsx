@@ -1,28 +1,39 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTilt } from "@/lib/useTilt";
 
 const W = 300; // box width
 const H = 230; // box height
 const D = 90; // box depth
 
+const BASE_RX = -18;
+const BASE_RY = -28;
+const MIN_RX = -70;
+const MAX_RX = 40;
+
 export function BlueprintHouse3D() {
-  const { ref, tilt, reducedMotion, onMouseMove, onMouseLeave } = useTilt(16);
-  const [autoRotY, setAutoRotY] = useState(0);
-  const [hovering, setHovering] = useState(false);
+  const [rot, setRot] = useState({ rx: BASE_RX, ry: BASE_RY });
+  const [dragging, setDragging] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0, rx: BASE_RX, ry: BASE_RY });
   const rafRef = useRef<number | undefined>(undefined);
   const lastRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const onChange = () => setReducedMotion(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion || dragging) return;
     function tick(now: number) {
       if (lastRef.current === undefined) lastRef.current = now;
       const dt = now - lastRef.current;
       lastRef.current = now;
-      if (!hovering) {
-        setAutoRotY((prev) => prev + dt * 0.012);
-      }
+      setRot((prev) => ({ ...prev, ry: prev.ry + dt * 0.01 }));
       rafRef.current = requestAnimationFrame(tick);
     }
     rafRef.current = requestAnimationFrame(tick);
@@ -30,40 +41,95 @@ export function BlueprintHouse3D() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lastRef.current = undefined;
     };
-  }, [hovering, reducedMotion]);
+  }, [dragging, reducedMotion]);
 
-  const baseRx = -14;
-  const baseRy = -26;
-  const rx = baseRx + tilt.rx;
-  const ry = baseRy + tilt.ry + autoRotY;
+  function onPointerDown(e: React.PointerEvent) {
+    if (reducedMotion) return;
+    (e.target as Element).setPointerCapture(e.pointerId);
+    setDragging(true);
+    dragStart.current = { x: e.clientX, y: e.clientY, rx: rot.rx, ry: rot.ry };
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (!dragging) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    setRot({
+      ry: dragStart.current.ry + dx * 0.35,
+      rx: Math.min(MAX_RX, Math.max(MIN_RX, dragStart.current.rx - dy * 0.35)),
+    });
+  }
+
+  function onPointerUp() {
+    setDragging(false);
+  }
 
   return (
     <div
-      ref={ref}
-      onMouseMove={(e) => {
-        setHovering(true);
-        onMouseMove(e);
-      }}
-      onMouseLeave={() => {
-        setHovering(false);
-        onMouseLeave();
-      }}
       style={{ perspective: "1400px" }}
       className="mx-auto w-full max-w-md select-none"
-      aria-hidden="true"
     >
       <div
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         style={{
           width: W,
           height: H,
           margin: "0 auto",
           position: "relative",
           transformStyle: "preserve-3d",
-          transform: `rotateX(${rx}deg) rotateY(${ry}deg)`,
-          transition: hovering ? "transform 80ms linear" : "transform 400ms ease-out",
+          transform: `rotateX(${rot.rx}deg) rotateY(${rot.ry}deg)`,
+          transition: dragging ? "none" : "transform 300ms ease-out",
+          cursor: reducedMotion ? "default" : dragging ? "grabbing" : "grab",
+          touchAction: "none",
         }}
+        aria-hidden="true"
       >
-        {/* floor */}
+        {/* roof plan (top) */}
+        <div
+          className="bp-grid-ink"
+          style={{
+            position: "absolute",
+            width: W,
+            height: D,
+            left: 0,
+            top: H / 2 - D / 2,
+            transform: `rotateX(90deg) translateZ(${-H / 2}px)`,
+            border: "1px solid color-mix(in srgb, var(--brass) 45%, transparent)",
+          }}
+        >
+          <svg viewBox="0 0 300 90" className="h-full w-full" aria-hidden="true">
+            <line x1="0" y1="45" x2="300" y2="45" stroke="var(--brass)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
+            <path d="M150 16 145 28 155 28 Z" fill="var(--brass)" />
+            <text
+              x="150"
+              y="42"
+              textAnchor="middle"
+              fontSize="8"
+              fill="var(--brass)"
+              fontFamily="var(--font-data)"
+              letterSpacing="0.1em"
+            >
+              N
+            </text>
+            <text
+              x="150"
+              y="72"
+              textAnchor="middle"
+              fontSize="7.5"
+              fill="var(--paper)"
+              fillOpacity="0.4"
+              fontFamily="var(--font-data)"
+              letterSpacing="0.08em"
+            >
+              CUBIERTA
+            </text>
+          </svg>
+        </div>
+
+        {/* floor / site plan (bottom) */}
         <div
           className="bp-grid-ink"
           style={{
@@ -73,10 +139,29 @@ export function BlueprintHouse3D() {
             left: 0,
             top: H / 2 - D / 2,
             transform: `rotateX(90deg) translateZ(${H / 2}px)`,
-            border: "1px solid color-mix(in srgb, var(--brass) 40%, transparent)",
-            opacity: 0.9,
+            border: "1px solid color-mix(in srgb, var(--brass) 45%, transparent)",
           }}
-        />
+        >
+          <svg viewBox="0 0 300 90" className="h-full w-full" aria-hidden="true">
+            <rect x="30" y="15" width="240" height="60" fill="none" stroke="var(--brass)" strokeWidth="1" strokeOpacity="0.65" />
+            <circle cx="30" cy="15" r="2" fill="var(--brass)" />
+            <circle cx="270" cy="15" r="2" fill="var(--brass)" />
+            <circle cx="30" cy="75" r="2" fill="var(--brass)" />
+            <circle cx="270" cy="75" r="2" fill="var(--brass)" />
+            <text
+              x="150"
+              y="49"
+              textAnchor="middle"
+              fontSize="7.5"
+              fill="var(--paper)"
+              fillOpacity="0.4"
+              fontFamily="var(--font-data)"
+              letterSpacing="0.08em"
+            >
+              PLANTA
+            </text>
+          </svg>
+        </div>
 
         {/* back (ghost) */}
         <div
@@ -90,7 +175,7 @@ export function BlueprintHouse3D() {
           <HouseFace />
         </div>
 
-        {/* left side panel */}
+        {/* left side elevation */}
         <div
           className="bp-grid-ink"
           style={{
@@ -103,12 +188,10 @@ export function BlueprintHouse3D() {
             border: "1px solid color-mix(in srgb, white 20%, transparent)",
           }}
         >
-          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[9px] tracking-[0.1em] text-paper/50">
-            LATERAL
-          </span>
+          <SideFace />
         </div>
 
-        {/* right side panel */}
+        {/* right side elevation */}
         <div
           className="bp-grid-ink"
           style={{
@@ -121,9 +204,7 @@ export function BlueprintHouse3D() {
             border: "1px solid color-mix(in srgb, white 20%, transparent)",
           }}
         >
-          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[9px] tracking-[0.1em] text-paper/50">
-            LATERAL
-          </span>
+          <SideFace />
         </div>
 
         {/* front (main elevation) */}
@@ -202,6 +283,41 @@ function HouseFace({ withDetail = false }: { withDetail?: boolean }) {
           </text>
         </>
       )}
+    </svg>
+  );
+}
+
+function SideFace() {
+  return (
+    <svg viewBox="0 0 90 230" fill="none" className="h-full w-full text-paper/70" aria-hidden="true">
+      <path
+        d="M12 90 45 38 78 90"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20 90V172H70V90"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect x="33" y="112" width="24" height="28" rx="1" stroke="currentColor" strokeWidth="1" />
+      <path d="M45 112V140M33 126H57" stroke="currentColor" strokeWidth="0.75" />
+      <text
+        x="45"
+        y="200"
+        textAnchor="middle"
+        fontSize="8"
+        fill="var(--brass)"
+        fillOpacity="0.7"
+        fontFamily="var(--font-data)"
+        letterSpacing="0.08em"
+      >
+        LATERAL
+      </text>
     </svg>
   );
 }
