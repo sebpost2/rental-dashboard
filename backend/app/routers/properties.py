@@ -1,24 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, get_owned_property
 from app.models.property import Property
 from app.models.user import User
 from app.schemas.property import PropertyCreate, PropertyRead, PropertyUpdate
 
 router = APIRouter(prefix="/properties", tags=["properties"])
-
-
-def _get_owned_property(property_id: int, db: Session, current_user: User) -> Property:
-    prop = (
-        db.query(Property)
-        .filter(Property.id == property_id, Property.owner_id == current_user.id)
-        .first()
-    )
-    if prop is None:
-        raise HTTPException(status_code=404, detail="Property not found")
-    return prop
 
 
 @router.post("", response_model=PropertyRead, status_code=status.HTTP_201_CREATED)
@@ -43,22 +32,16 @@ def list_properties(
 
 
 @router.get("/{property_id}", response_model=PropertyRead)
-def get_property(
-    property_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    return _get_owned_property(property_id, db, current_user)
+def get_property(prop: Property = Depends(get_owned_property)):
+    return prop
 
 
 @router.patch("/{property_id}", response_model=PropertyRead)
 def update_property(
-    property_id: int,
     payload: PropertyUpdate,
+    prop: Property = Depends(get_owned_property),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
-    prop = _get_owned_property(property_id, db, current_user)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(prop, field, value)
     db.commit()
@@ -68,10 +51,8 @@ def update_property(
 
 @router.delete("/{property_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_property(
-    property_id: int,
+    prop: Property = Depends(get_owned_property),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
-    prop = _get_owned_property(property_id, db, current_user)
     db.delete(prop)
     db.commit()
