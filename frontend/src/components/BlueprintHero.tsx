@@ -12,7 +12,9 @@ export function BlueprintHero() {
         <span className="hidden text-paper/35 sm:inline">Arrastra para girar el modelo</span>
       </div>
 
-      <BlueprintHouse3D />
+      <div className="flex flex-1 items-center justify-center">
+        <BlueprintHouse3D />
+      </div>
 
       <div className="max-w-xs">
         <p className="font-heading text-lg leading-snug text-paper">

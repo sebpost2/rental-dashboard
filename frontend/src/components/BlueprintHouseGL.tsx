@@ -142,7 +142,7 @@ export function BlueprintHouseGL() {
 
   return (
     <div
-      className="relative mx-auto h-72 w-full max-w-md sm:h-80"
+      className="relative mx-auto h-full max-h-130 min-h-72 w-full max-w-lg"
       style={{ cursor: reducedMotion ? "default" : "grab" }}
     >
       <div
