@@ -154,7 +154,7 @@ export function BlueprintHouseGL() {
       <Canvas
         shadows
         gl={{ alpha: true, antialias: true }}
-        camera={{ position: [3.9, 4.7, 4.6], fov: 30 }}
+        camera={{ position: [5.5, 6.6, 6.5], fov: 30 }}
         dpr={[1, 1.75]}
       >
         <Suspense fallback={null}>
