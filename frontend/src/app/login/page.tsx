@@ -31,6 +31,19 @@ export default function LoginPage() {
     }
   }
 
+  async function handleDemoLogin() {
+    setError(null);
+    setLoading(true);
+    try {
+      await apiLogin("demo@rentalledger.com", "demopass123");
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Error al iniciar la demo");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background">
       <div className="flex items-center gap-2 text-ink">
@@ -70,6 +83,20 @@ export default function LoginPage() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">o</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={loading}
+            onClick={handleDemoLogin}
+          >
+            Ver demo en vivo
+          </Button>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             ¿No tienes cuenta?{" "}
             <Link href="/register" className="underline">
