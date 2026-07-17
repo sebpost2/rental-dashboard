@@ -89,11 +89,23 @@ export default function DashboardPage() {
     <>
       <AppHeader active="dashboard" email={user.email} />
       <main className="mx-auto w-full max-w-6xl space-y-6 p-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div className="flex items-baseline justify-between border-b border-border pb-4">
+          <div>
+            <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
+              Hoja 02 · Resumen
+            </p>
+            <h1 className="mt-1 font-heading text-2xl font-semibold">Dashboard</h1>
+          </div>
+          <p className="hidden font-mono text-xs text-muted-foreground sm:block">
+            {new Date().toLocaleDateString("es", { year: "numeric", month: "long" })}
+          </p>
+        </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-4">
+      <div className="reg-marks flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-4">
         <div className="space-y-1">
-          <Label htmlFor="filter-property">Propiedad</Label>
+          <Label htmlFor="filter-property" className="text-xs tracking-[0.08em] uppercase">
+            Propiedad
+          </Label>
           <Select value={propertyId} onValueChange={(v) => setPropertyId(v ?? "all")}>
             <SelectTrigger id="filter-property" className="w-48">
               <SelectValue>
@@ -115,7 +127,9 @@ export default function DashboardPage() {
           </Select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="filter-start">Desde</Label>
+          <Label htmlFor="filter-start" className="text-xs tracking-[0.08em] uppercase">
+            Desde
+          </Label>
           <Input
             id="filter-start"
             type="date"
@@ -124,7 +138,9 @@ export default function DashboardPage() {
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="filter-end">Hasta</Label>
+          <Label htmlFor="filter-end" className="text-xs tracking-[0.08em] uppercase">
+            Hasta
+          </Label>
           <Input
             id="filter-end"
             type="date"

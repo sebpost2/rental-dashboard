@@ -148,6 +148,48 @@
   }
 }
 
+.bp-grid-paper {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--blueprint) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--blueprint) 10%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bp-grid-ink {
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(color-mix(in srgb, white 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, white 8%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Registration marks: corner ticks borrowed from architectural drawing sheets */
+.reg-marks {
+  position: relative;
+}
+.reg-marks::before,
+.reg-marks::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+}
+.reg-marks::before {
+  top: 6px;
+  left: 6px;
+  border-top: 1.5px solid var(--brass);
+  border-left: 1.5px solid var(--brass);
+  opacity: 0.6;
+}
+.reg-marks::after {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 1.5px solid var(--brass);
+  border-right: 1.5px solid var(--brass);
+  opacity: 0.6;
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;

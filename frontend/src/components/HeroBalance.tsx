@@ -59,7 +59,7 @@ export function HeroBalance({
   const linePath = points.length > 1 ? `M${points.join(" L")}` : "";
 
   return (
-    <div className="rise-in rise-in-1 rounded-md border border-border bg-card p-6">
+    <div className="reg-marks rise-in rise-in-1 rounded-md border border-border bg-card p-6">
       <p className="text-sm text-muted-foreground">Balance neto</p>
       <p className={`mt-1 font-heading text-5xl font-semibold tabular-nums ${tone}`}>
         {formatMoney(animated)}

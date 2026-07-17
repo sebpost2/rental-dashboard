@@ -33,7 +33,7 @@ export default function RootLayout({
       lang="es"
       className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="bp-grid-paper min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

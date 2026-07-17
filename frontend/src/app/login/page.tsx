@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiLogin, ApiError } from "@/lib/api";
 import { RooflineIcon } from "@/components/RooflineIcon";
+import { BlueprintHero } from "@/components/BlueprintHero";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,66 +46,72 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background">
-      <div className="flex items-center gap-2 text-ink">
-        <RooflineIcon className="size-6 text-brass" />
-        <span className="font-heading text-sm font-medium tracking-[0.14em] uppercase">
-          Rental Ledger
-        </span>
-      </div>
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Iniciar sesión</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+    <main className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
+      <BlueprintHero />
+      <div className="flex flex-col items-center justify-center gap-8 p-6">
+        <div className="flex items-center gap-2 text-ink lg:hidden">
+          <RooflineIcon className="size-6 text-brass" />
+          <span className="font-heading text-sm font-medium tracking-[0.14em] uppercase">
+            Rental Ledger
+          </span>
+        </div>
+        <Card className="reg-marks w-full max-w-sm">
+          <CardHeader>
+            <p className="text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
+              Acceso
+            </p>
+            <CardTitle className="text-xl">Iniciar sesión</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">o</span>
+              <div className="h-px flex-1 bg-border" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              disabled={loading}
+              onClick={handleDemoLogin}
+            >
+              Ver demo en vivo
             </Button>
-          </form>
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">o</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            disabled={loading}
-            onClick={handleDemoLogin}
-          >
-            Ver demo en vivo
-          </Button>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            ¿No tienes cuenta?{" "}
-            <Link href="/register" className="underline">
-              Regístrate
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              ¿No tienes cuenta?{" "}
+              <Link href="/register" className="underline">
+                Regístrate
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }
