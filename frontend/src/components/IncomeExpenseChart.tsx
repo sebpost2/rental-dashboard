@@ -16,13 +16,10 @@ export function IncomeExpenseChart({ data }: { data: TimeseriesPoint[] }) {
   );
 
   return (
-    <div className="rd-chart rounded-lg border border-border bg-card p-4">
+    <div className="rd-chart rounded-md border border-border bg-card p-4">
       <style>{`
-        .rd-chart { --series-income: #2a78d6; --series-expenses: #008300; }
-        @media (prefers-color-scheme: dark) {
-          :root:where(:not([data-theme="light"])) .rd-chart { --series-income: #3987e5; --series-expenses: #008300; }
-        }
-        :root[data-theme="dark"] .rd-chart { --series-income: #3987e5; --series-expenses: #008300; }
+        .rd-chart { --series-income: #3d6e9e; --series-expenses: #b4453a; }
+        .dark .rd-chart { --series-income: #5a93c4; --series-expenses: #d9695c; }
       `}</style>
 
       <div className="flex items-center justify-between">
@@ -68,8 +65,8 @@ export function IncomeExpenseChart({ data }: { data: TimeseriesPoint[] }) {
             {data.map((d) => (
               <tr key={d.period} className="border-t border-border">
                 <td className="py-1.5">{d.period}</td>
-                <td className="py-1.5 tabular-nums">{d.income.toFixed(2)}</td>
-                <td className="py-1.5 tabular-nums">{d.expenses.toFixed(2)}</td>
+                <td className="py-1.5 font-mono tabular-nums">{d.income.toFixed(2)}</td>
+                <td className="py-1.5 font-mono tabular-nums">{d.expenses.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -91,7 +88,7 @@ export function IncomeExpenseChart({ data }: { data: TimeseriesPoint[] }) {
                   onMouseLeave={() => setHover(null)}
                 >
                   {hover?.period === d.period && hover.series === "Ingresos" && (
-                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-1.5 py-0.5 text-xs text-popover-foreground shadow-md">
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-1.5 py-0.5 font-mono text-xs tabular-nums text-popover-foreground shadow-md">
                       {d.income.toFixed(2)}
                     </div>
                   )}
@@ -108,7 +105,7 @@ export function IncomeExpenseChart({ data }: { data: TimeseriesPoint[] }) {
                   onMouseLeave={() => setHover(null)}
                 >
                   {hover?.period === d.period && hover.series === "Gastos" && (
-                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-1.5 py-0.5 text-xs text-popover-foreground shadow-md">
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-popover px-1.5 py-0.5 font-mono text-xs tabular-nums text-popover-foreground shadow-md">
                       {d.expenses.toFixed(2)}
                     </div>
                   )}

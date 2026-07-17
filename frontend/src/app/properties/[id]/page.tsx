@@ -36,6 +36,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AppHeader } from "@/components/AppHeader";
+import { RooflineIcon } from "@/components/RooflineIcon";
 
 export default function PropertyDetailPage() {
   const token = useAuthGuard();
@@ -103,11 +105,16 @@ export default function PropertyDetailPage() {
   if (!token || !property) return null;
 
   return (
-    <main className="p-8 space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">{property.name}</h1>
-        <p className="text-muted-foreground">{property.address}</p>
-      </div>
+    <>
+      <AppHeader active="properties" />
+      <main className="mx-auto w-full max-w-6xl space-y-8 p-8">
+        <div className="flex items-center gap-3">
+          <RooflineIcon className="size-8 text-blueprint" />
+          <div>
+            <h1 className="text-2xl font-semibold">{property.name}</h1>
+            <p className="text-muted-foreground">{property.address}</p>
+          </div>
+        </div>
 
       <div className="grid gap-8 md:grid-cols-2">
         <Card>
@@ -163,8 +170,8 @@ export default function PropertyDetailPage() {
               <TableBody>
                 {incomes.map((i) => (
                   <TableRow key={i.id}>
-                    <TableCell>{i.date}</TableCell>
-                    <TableCell>{i.amount}</TableCell>
+                    <TableCell className="font-mono tabular-nums">{i.date}</TableCell>
+                    <TableCell className="font-mono tabular-nums">{i.amount}</TableCell>
                     <TableCell>{i.source}</TableCell>
                     <TableCell>
                       <Button
@@ -244,8 +251,8 @@ export default function PropertyDetailPage() {
               <TableBody>
                 {expenses.map((e) => (
                   <TableRow key={e.id}>
-                    <TableCell>{e.date}</TableCell>
-                    <TableCell>{e.amount}</TableCell>
+                    <TableCell className="font-mono tabular-nums">{e.date}</TableCell>
+                    <TableCell className="font-mono tabular-nums">{e.amount}</TableCell>
                     <TableCell>{e.category}</TableCell>
                     <TableCell>
                       <Button
@@ -262,7 +269,8 @@ export default function PropertyDetailPage() {
             </Table>
           </CardContent>
         </Card>
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 }

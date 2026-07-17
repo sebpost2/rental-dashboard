@@ -9,15 +9,17 @@ export function StatTile({
 }) {
   const toneClass =
     tone === "positive"
-      ? "text-[#006300] dark:text-[#0ca30c]"
+      ? "text-brass"
       : tone === "negative"
-        ? "text-destructive"
+        ? "text-brick"
         : "text-foreground";
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="rounded-md border border-border bg-card p-4">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold ${toneClass}`}>{value}</p>
+      <p className={`mt-1 font-mono text-3xl font-semibold tabular-nums ${toneClass}`}>
+        {value}
+      </p>
     </div>
   );
 }

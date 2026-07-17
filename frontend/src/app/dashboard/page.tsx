@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   apiExportCsv,
   apiListProperties,
@@ -15,7 +14,7 @@ import {
   User,
 } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { StatTile } from "@/components/StatTile";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
+import { AppHeader } from "@/components/AppHeader";
 
 function formatMoney(value: number): string {
   return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -69,11 +69,6 @@ export default function DashboardPage() {
     apiReportTimeseries(token, filters).then(setTimeseries);
   }, [user, propertyId, startDate, endDate]);
 
-  function handleLogout() {
-    clearToken();
-    router.push("/login");
-  }
-
   async function handleExport() {
     const token = getToken();
     if (!token) return;
@@ -93,23 +88,12 @@ export default function DashboardPage() {
   if (!user) return null;
 
   return (
-    <main className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Sesión iniciada como {user.email}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link href="/properties" className={buttonVariants({ variant: "outline" })}>
-            Ver propiedades
-          </Link>
-          <Button variant="outline" onClick={handleLogout}>
-            Cerrar sesión
-          </Button>
-        </div>
-      </div>
+    <>
+      <AppHeader active="dashboard" email={user.email} />
+      <main className="mx-auto w-full max-w-6xl space-y-6 p-8">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-4">
         <div className="space-y-1">
           <Label htmlFor="filter-property">Propiedad</Label>
           <Select value={propertyId} onValueChange={(v) => setPropertyId(v ?? "all")}>
@@ -167,7 +151,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <IncomeExpenseChart data={timeseries} />
-    </main>
+        <IncomeExpenseChart data={timeseries} />
+      </main>
+    </>
   );
 }

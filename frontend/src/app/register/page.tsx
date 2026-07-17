@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiLogin, apiRegister, ApiError } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import { RooflineIcon } from "@/components/RooflineIcon";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,7 +35,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/40">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background">
+      <div className="flex items-center gap-2 text-ink">
+        <RooflineIcon className="size-6 text-brass" />
+        <span className="font-heading text-sm font-medium tracking-[0.14em] uppercase">
+          Rental Ledger
+        </span>
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Crear cuenta</CardTitle>
