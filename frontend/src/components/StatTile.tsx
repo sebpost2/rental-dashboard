@@ -15,9 +15,9 @@ export function StatTile({
         : "text-foreground";
 
   return (
-    <div className="rounded-md border border-border bg-card p-4">
+    <div className="rounded-md border border-border bg-card p-4 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-sm">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className={`mt-1 font-mono text-3xl font-semibold tabular-nums ${toneClass}`}>
+      <p className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${toneClass}`}>
         {value}
       </p>
     </div>

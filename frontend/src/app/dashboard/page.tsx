@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   apiExportCsv,
@@ -27,6 +27,7 @@ import {
 import { StatTile } from "@/components/StatTile";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { AppHeader } from "@/components/AppHeader";
+import { HeroBalance } from "@/components/HeroBalance";
 
 function formatMoney(value: number): string {
   return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -68,6 +69,14 @@ export default function DashboardPage() {
     apiReportSummary(token, filters).then(setSummary);
     apiReportTimeseries(token, filters).then(setTimeseries);
   }, [user, propertyId, startDate, endDate]);
+
+  const cumulativeTrend = useMemo(() => {
+    let running = 0;
+    return timeseries.map((t) => {
+      running += t.income - t.expenses;
+      return { period: t.period, cumulative: running };
+    });
+  }, [timeseries]);
 
   async function handleExport() {
     const token = getToken();
@@ -140,18 +149,19 @@ export default function DashboardPage() {
       </div>
 
       {summary && (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatTile label="Ingresos totales" value={formatMoney(summary.total_income)} />
-          <StatTile label="Gastos totales" value={formatMoney(summary.total_expenses)} />
-          <StatTile
-            label="Balance neto"
-            value={formatMoney(summary.net_balance)}
-            tone={summary.net_balance >= 0 ? "positive" : "negative"}
-          />
-        </div>
+        <>
+          <HeroBalance netBalance={summary.net_balance} trend={cumulativeTrend} />
+
+          <div className="rise-in rise-in-2 grid gap-4 sm:grid-cols-2">
+            <StatTile label="Ingresos totales" value={formatMoney(summary.total_income)} />
+            <StatTile label="Gastos totales" value={formatMoney(summary.total_expenses)} />
+          </div>
+        </>
       )}
 
-        <IncomeExpenseChart data={timeseries} />
+        <div className="rise-in rise-in-3">
+          <IncomeExpenseChart data={timeseries} />
+        </div>
       </main>
     </>
   );
