@@ -2,12 +2,22 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.db import get_db
 from app.core.security import decode_access_token
 from app.models.property import Property
 from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
+
+
+def verify_origin(request: Request) -> None:
+    """CSRF guard for endpoints browsers can hit without a CORS preflight
+    (form-urlencoded/no-body POSTs). Rejects if Origin is present and not
+    an allowed origin; browsers always send Origin on such requests."""
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in settings.cors_origin_list:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid origin")
 
 
 def get_current_user(

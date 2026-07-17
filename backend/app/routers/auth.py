@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.db import get_db
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, verify_origin
 from app.core.limiter import limiter
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
@@ -41,7 +41,7 @@ def register(request: Request, payload: UserCreate, db: Session = Depends(get_db
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, dependencies=[Depends(verify_origin)])
 @limiter.limit("10/minute")
 def login(
     request: Request,
@@ -62,7 +62,7 @@ def login(
     return Token(access_token=access_token)
 
 
-@router.post("/logout")
+@router.post("/logout", dependencies=[Depends(verify_origin)])
 def logout(response: Response):
     response.delete_cookie(key=COOKIE_NAME, path="/")
     return {"status": "ok"}
