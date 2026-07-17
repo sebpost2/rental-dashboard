@@ -47,3 +47,68 @@ export async function apiMe(token: string): Promise<User> {
   if (!response.ok) throw new ApiError(await parseError(response));
   return response.json();
 }
+
+export type Property = {
+  id: number;
+  name: string;
+  address: string;
+  property_type: string;
+  currency: string;
+};
+
+export type PropertyInput = {
+  name: string;
+  address: string;
+  property_type: string;
+  currency: string;
+};
+
+async function authedFetch(token: string, path: string, init: RequestInit = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      Authorization: `Bearer ${token}`,
+      ...init.headers,
+    },
+  });
+  if (!response.ok) throw new ApiError(await parseError(response));
+  return response;
+}
+
+export async function apiListProperties(token: string): Promise<Property[]> {
+  return (await authedFetch(token, "/properties")).json();
+}
+
+export async function apiGetProperty(token: string, id: number): Promise<Property> {
+  return (await authedFetch(token, `/properties/${id}`)).json();
+}
+
+export async function apiCreateProperty(
+  token: string,
+  input: PropertyInput
+): Promise<Property> {
+  return (
+    await authedFetch(token, "/properties", {
+      method: "POST",
+      body: JSON.stringify(input),
+    })
+  ).json();
+}
+
+export async function apiUpdateProperty(
+  token: string,
+  id: number,
+  input: Partial<PropertyInput>
+): Promise<Property> {
+  return (
+    await authedFetch(token, `/properties/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    })
+  ).json();
+}
+
+export async function apiDeleteProperty(token: string, id: number): Promise<void> {
+  await authedFetch(token, `/properties/${id}`, { method: "DELETE" });
+}

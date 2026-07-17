@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { apiMe, User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -40,6 +41,9 @@ export default function DashboardPage() {
         </Button>
       </div>
       <p className="mt-4 text-muted-foreground">Sesión iniciada como {user.email}</p>
+      <Link href="/properties" className={buttonVariants({ className: "mt-6" })}>
+        Ver propiedades
+      </Link>
     </main>
   );
 }
