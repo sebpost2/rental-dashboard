@@ -233,3 +233,50 @@ export async function apiDeleteExpense(
     method: "DELETE",
   });
 }
+
+export type ReportSummary = {
+  total_income: number;
+  total_expenses: number;
+  net_balance: number;
+};
+
+export type TimeseriesPoint = {
+  period: string;
+  income: number;
+  expenses: number;
+};
+
+export type ReportFilters = {
+  propertyId?: number;
+  startDate?: string;
+  endDate?: string;
+};
+
+function reportQuery(filters: ReportFilters): string {
+  const params = new URLSearchParams();
+  if (filters.propertyId) params.set("property_id", String(filters.propertyId));
+  if (filters.startDate) params.set("start_date", filters.startDate);
+  if (filters.endDate) params.set("end_date", filters.endDate);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export async function apiReportSummary(
+  token: string,
+  filters: ReportFilters
+): Promise<ReportSummary> {
+  return (await authedFetch(token, `/reports/summary${reportQuery(filters)}`)).json();
+}
+
+export async function apiReportTimeseries(
+  token: string,
+  filters: ReportFilters
+): Promise<TimeseriesPoint[]> {
+  return (
+    await authedFetch(token, `/reports/timeseries${reportQuery(filters)}`)
+  ).json();
+}
+
+export async function apiExportCsv(token: string, filters: ReportFilters): Promise<Blob> {
+  return (await authedFetch(token, `/reports/export${reportQuery(filters)}`)).blob();
+}
