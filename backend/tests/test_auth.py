@@ -87,3 +87,34 @@ def test_register_is_rate_limited(client):
     ]
 
     assert responses[-1].status_code == 429
+
+
+def test_login_sets_httponly_cookie(client):
+    register(client)
+    response = login(client)
+
+    cookie = response.cookies.get("access_token")
+    assert cookie is not None
+    set_cookie_header = response.headers.get("set-cookie", "")
+    assert "HttpOnly" in set_cookie_header
+
+
+def test_me_works_via_cookie_without_header(client):
+    register(client)
+    login(client)
+
+    response = client.get("/auth/me")
+
+    assert response.status_code == 200
+    assert response.json()["email"] == "user@example.com"
+
+
+def test_logout_clears_cookie(client):
+    register(client)
+    login(client)
+
+    logout_response = client.post("/auth/logout")
+    me_response = client.get("/auth/me")
+
+    assert logout_response.status_code == 200
+    assert me_response.status_code == 401
