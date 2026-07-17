@@ -63,7 +63,11 @@ export default function PropertiesPage() {
           <TableBody>
             {properties.map((p) => (
               <TableRow key={p.id}>
-                <TableCell>{p.name}</TableCell>
+                <TableCell>
+                  <Link href={`/properties/${p.id}`} className="underline">
+                    {p.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{p.address}</TableCell>
                 <TableCell>{p.property_type}</TableCell>
                 <TableCell>{p.currency}</TableCell>

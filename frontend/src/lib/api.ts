@@ -112,3 +112,124 @@ export async function apiUpdateProperty(
 export async function apiDeleteProperty(token: string, id: number): Promise<void> {
   await authedFetch(token, `/properties/${id}`, { method: "DELETE" });
 }
+
+export type Income = {
+  id: number;
+  date: string;
+  amount: number;
+  source: string;
+  notes: string | null;
+};
+
+export type IncomeInput = {
+  date: string;
+  amount: number;
+  source: string;
+  notes?: string;
+};
+
+export const EXPENSE_CATEGORIES = [
+  "cleaning",
+  "maintenance",
+  "commission",
+  "other",
+] as const;
+
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+export type Expense = {
+  id: number;
+  date: string;
+  amount: number;
+  category: ExpenseCategory;
+  notes: string | null;
+};
+
+export type ExpenseInput = {
+  date: string;
+  amount: number;
+  category: ExpenseCategory;
+  notes?: string;
+};
+
+function dateRangeQuery(startDate?: string, endDate?: string): string {
+  const params = new URLSearchParams();
+  if (startDate) params.set("start_date", startDate);
+  if (endDate) params.set("end_date", endDate);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export async function apiListIncome(
+  token: string,
+  propertyId: number,
+  startDate?: string,
+  endDate?: string
+): Promise<Income[]> {
+  return (
+    await authedFetch(
+      token,
+      `/properties/${propertyId}/incomes${dateRangeQuery(startDate, endDate)}`
+    )
+  ).json();
+}
+
+export async function apiCreateIncome(
+  token: string,
+  propertyId: number,
+  input: IncomeInput
+): Promise<Income> {
+  return (
+    await authedFetch(token, `/properties/${propertyId}/incomes`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    })
+  ).json();
+}
+
+export async function apiDeleteIncome(
+  token: string,
+  propertyId: number,
+  incomeId: number
+): Promise<void> {
+  await authedFetch(token, `/properties/${propertyId}/incomes/${incomeId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function apiListExpenses(
+  token: string,
+  propertyId: number,
+  startDate?: string,
+  endDate?: string
+): Promise<Expense[]> {
+  return (
+    await authedFetch(
+      token,
+      `/properties/${propertyId}/expenses${dateRangeQuery(startDate, endDate)}`
+    )
+  ).json();
+}
+
+export async function apiCreateExpense(
+  token: string,
+  propertyId: number,
+  input: ExpenseInput
+): Promise<Expense> {
+  return (
+    await authedFetch(token, `/properties/${propertyId}/expenses`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    })
+  ).json();
+}
+
+export async function apiDeleteExpense(
+  token: string,
+  propertyId: number,
+  expenseId: number
+): Promise<void> {
+  await authedFetch(token, `/properties/${propertyId}/expenses/${expenseId}`, {
+    method: "DELETE",
+  });
+}
