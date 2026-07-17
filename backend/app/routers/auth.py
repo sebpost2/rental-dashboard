@@ -1,13 +1,28 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.db import get_db
 from app.core.deps import get_current_user
 from app.core.limiter import limiter
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserRead
+
+COOKIE_NAME = "access_token"
+
+
+def _set_auth_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=settings.is_production,
+        samesite="none" if settings.is_production else "lax",
+        max_age=settings.access_token_expire_minutes * 60,
+        path="/",
+    )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -30,6 +45,7 @@ def register(request: Request, payload: UserCreate, db: Session = Depends(get_db
 @limiter.limit("10/minute")
 def login(
     request: Request,
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
@@ -42,7 +58,14 @@ def login(
         )
 
     access_token = create_access_token(subject=user.email)
+    _set_auth_cookie(response, access_token)
     return Token(access_token=access_token)
+
+
+@router.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(key=COOKIE_NAME, path="/")
+    return {"status": "ok"}
 
 
 @router.get("/me", response_model=UserRead)

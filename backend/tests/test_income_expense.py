@@ -26,6 +26,7 @@ def create_property(client, headers, name="Beach House"):
 def test_create_income_requires_auth(client):
     headers = register_and_login(client, "owner1@example.com")
     prop = create_property(client, headers)
+    client.cookies.clear()
 
     response = client.post(
         f"/properties/{prop['id']}/incomes",
