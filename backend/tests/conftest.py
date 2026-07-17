@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.db import Base, get_db
+from app.core.limiter import limiter
 from app.main import app
 
 engine = create_engine(
@@ -31,6 +32,12 @@ def setup_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    limiter.reset()
+    yield
 
 
 @pytest.fixture
