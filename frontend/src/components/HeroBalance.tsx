@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatMoney } from "@/lib/format";
+import { useTilt } from "@/lib/useTilt";
 
 function useCountUp(target: number, durationMs = 700): number {
   const [value, setValue] = useState(0);
@@ -58,26 +59,47 @@ export function HeroBalance({
       : "";
   const linePath = points.length > 1 ? `M${points.join(" L")}` : "";
 
+  const { ref, tilt, hovering, onMouseMove, onMouseLeave } = useTilt(5);
+
   return (
-    <div className="reg-marks rise-in rise-in-1 rounded-md border border-border bg-card p-6">
-      <p className="text-sm text-muted-foreground">Balance neto</p>
-      <p className={`mt-1 font-heading text-5xl font-semibold tabular-nums ${tone}`}>
-        {formatMoney(animated)}
-      </p>
-      {points.length > 1 && (
-        <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-4 h-16 w-full">
-          <path d={areaPath} fill="var(--blueprint)" opacity="0.1" />
-          <path
-            d={linePath}
-            fill="none"
-            stroke="var(--blueprint)"
-            strokeWidth="0.6"
-            vectorEffect="non-scaling-stroke"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
+    <div style={{ perspective: "900px" }}>
+      <div
+        ref={ref}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        style={{
+          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+          transition: "transform 150ms ease-out",
+          transformStyle: "preserve-3d",
+        }}
+        className="reg-marks rise-in rise-in-1 relative overflow-hidden rounded-md border border-border bg-card p-6"
+      >
+        <div
+          className="pointer-events-none absolute inset-0 transition-opacity duration-150"
+          style={{
+            opacity: hovering ? 1 : 0,
+            background: `radial-gradient(240px circle at ${tilt.px}% ${tilt.py}%, color-mix(in srgb, var(--brass) 12%, transparent), transparent 70%)`,
+          }}
+        />
+        <p className="text-sm text-muted-foreground">Balance neto</p>
+        <p className={`mt-1 font-heading text-5xl font-semibold tabular-nums ${tone}`}>
+          {formatMoney(animated)}
+        </p>
+        {points.length > 1 && (
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-4 h-16 w-full">
+            <path d={areaPath} fill="var(--blueprint)" opacity="0.1" />
+            <path
+              d={linePath}
+              fill="none"
+              stroke="var(--blueprint)"
+              strokeWidth="0.6"
+              vectorEffect="non-scaling-stroke"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </div>
     </div>
   );
 }
