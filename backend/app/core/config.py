@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,6 +11,13 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24
     environment: str = "development"
     cors_origins: str = "http://localhost:3000"
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalize_postgres_scheme(cls, v: str) -> str:
+        if v.startswith("postgres://"):
+            return "postgresql://" + v[len("postgres://") :]
+        return v
 
     @property
     def cors_origin_list(self) -> list[str]:
