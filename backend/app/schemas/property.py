@@ -1,18 +1,18 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PropertyCreate(BaseModel):
-    name: str
-    address: str
-    property_type: str = "apartment"
-    currency: str = "USD"
+    name: str = Field(min_length=1, max_length=200)
+    address: str = Field(min_length=1, max_length=500)
+    property_type: str = Field(default="apartment", max_length=50)
+    currency: str = Field(default="USD", min_length=3, max_length=3)
 
 
 class PropertyUpdate(BaseModel):
-    name: str | None = None
-    address: str | None = None
-    property_type: str | None = None
-    currency: str | None = None
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    address: str | None = Field(default=None, min_length=1, max_length=500)
+    property_type: str | None = Field(default=None, max_length=50)
+    currency: str | None = Field(default=None, min_length=3, max_length=3)
 
 
 class PropertyRead(BaseModel):

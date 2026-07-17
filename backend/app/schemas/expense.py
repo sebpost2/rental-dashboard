@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ExpenseCategory(str, Enum):
@@ -13,9 +13,9 @@ class ExpenseCategory(str, Enum):
 
 class ExpenseCreate(BaseModel):
     date: date
-    amount: float
+    amount: float = Field(ge=0)
     category: ExpenseCategory
-    notes: str | None = None
+    notes: str | None = Field(default=None, max_length=1000)
 
 
 class ExpenseRead(BaseModel):
