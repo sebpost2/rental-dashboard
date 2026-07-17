@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { formatMoney } from "@/lib/format";
 
 function useCountUp(target: number, durationMs = 700): number {
   const [value, setValue] = useState(0);
@@ -30,13 +31,6 @@ function useCountUp(target: number, durationMs = 700): number {
   }, [target, durationMs]);
 
   return value;
-}
-
-function formatMoney(value: number): string {
-  return value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
 }
 
 export function HeroBalance({

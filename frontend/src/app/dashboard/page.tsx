@@ -27,10 +27,7 @@ import { StatTile } from "@/components/StatTile";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { AppHeader } from "@/components/AppHeader";
 import { HeroBalance } from "@/components/HeroBalance";
-
-function formatMoney(value: number): string {
-  return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+import { formatMoney } from "@/lib/format";
 
 export default function DashboardPage() {
   const router = useRouter();

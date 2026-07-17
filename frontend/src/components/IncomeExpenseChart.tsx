@@ -19,7 +19,9 @@ export function IncomeExpenseChart({ data }: { data: TimeseriesPoint[] }) {
     <div className="rd-chart rounded-md border border-border bg-card p-4">
       <style>{`
         .rd-chart { --series-income: #3d6e9e; --series-expenses: #b4453a; }
-        .dark .rd-chart { --series-income: #5a93c4; --series-expenses: #d9695c; }
+        @media (prefers-color-scheme: dark) {
+          .rd-chart { --series-income: #5a93c4; --series-expenses: #d9695c; }
+        }
       `}</style>
 
       <div className="flex items-center justify-between">
