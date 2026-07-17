@@ -13,7 +13,6 @@ import {
   TimeseriesPoint,
   User,
 } from "@/lib/api";
-import { clearToken, getToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,30 +43,25 @@ export default function DashboardPage() {
   const [timeseries, setTimeseries] = useState<TimeseriesPoint[]>([]);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-    apiMe(token)
+    apiMe()
       .then(setUser)
       .catch(() => {
-        clearToken();
         router.push("/login");
       });
-    apiListProperties(token).then(setProperties);
+    apiListProperties()
+      .then(setProperties)
+      .catch(() => {});
   }, [router]);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token || !user) return;
+    if (!user) return;
     const filters = {
       propertyId: propertyId === "all" ? undefined : Number(propertyId),
       startDate: startDate || undefined,
       endDate: endDate || undefined,
     };
-    apiReportSummary(token, filters).then(setSummary);
-    apiReportTimeseries(token, filters).then(setTimeseries);
+    apiReportSummary(filters).then(setSummary);
+    apiReportTimeseries(filters).then(setTimeseries);
   }, [user, propertyId, startDate, endDate]);
 
   const cumulativeTrend = useMemo(() => {
@@ -79,9 +73,7 @@ export default function DashboardPage() {
   }, [timeseries]);
 
   async function handleExport() {
-    const token = getToken();
-    if (!token) return;
-    const blob = await apiExportCsv(token, {
+    const blob = await apiExportCsv({
       propertyId: propertyId === "all" ? undefined : Number(propertyId),
       startDate: startDate || undefined,
       endDate: endDate || undefined,

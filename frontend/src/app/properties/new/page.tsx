@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function NewPropertyPage() {
-  const token = useAuthGuard();
+  const user = useAuthGuard();
   const router = useRouter();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -21,11 +21,10 @@ export default function NewPropertyPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return;
     setError(null);
     setLoading(true);
     try {
-      await apiCreateProperty(token, {
+      await apiCreateProperty({
         name,
         address,
         property_type: propertyType,
@@ -39,7 +38,7 @@ export default function NewPropertyPage() {
     }
   }
 
-  if (!token) return null;
+  if (!user) return null;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background">

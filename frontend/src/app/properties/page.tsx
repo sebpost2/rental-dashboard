@@ -17,24 +17,23 @@ import { AppHeader } from "@/components/AppHeader";
 import { RooflineIcon } from "@/components/RooflineIcon";
 
 export default function PropertiesPage() {
-  const token = useAuthGuard();
+  const user = useAuthGuard();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) return;
-    apiListProperties(token)
+    if (!user) return;
+    apiListProperties()
       .then(setProperties)
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [user]);
 
   async function handleDelete(id: number) {
-    if (!token) return;
-    await apiDeleteProperty(token, id);
+    await apiDeleteProperty(id);
     setProperties((prev) => prev.filter((p) => p.id !== id));
   }
 
-  if (!token) return null;
+  if (!user) return null;
 
   return (
     <>

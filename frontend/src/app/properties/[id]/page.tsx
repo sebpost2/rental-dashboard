@@ -40,7 +40,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { RooflineIcon } from "@/components/RooflineIcon";
 
 export default function PropertyDetailPage() {
-  const token = useAuthGuard();
+  const user = useAuthGuard();
   const params = useParams<{ id: string }>();
   const propertyId = Number(params.id);
 
@@ -57,16 +57,15 @@ export default function PropertyDetailPage() {
   const [expenseCategory, setExpenseCategory] = useState<ExpenseCategory>("cleaning");
 
   useEffect(() => {
-    if (!token) return;
-    apiGetProperty(token, propertyId).then(setProperty);
-    apiListIncome(token, propertyId).then(setIncomes);
-    apiListExpenses(token, propertyId).then(setExpenses);
-  }, [token, propertyId]);
+    if (!user) return;
+    apiGetProperty(propertyId).then(setProperty);
+    apiListIncome(propertyId).then(setIncomes);
+    apiListExpenses(propertyId).then(setExpenses);
+  }, [user, propertyId]);
 
   async function handleAddIncome(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return;
-    const created = await apiCreateIncome(token, propertyId, {
+    const created = await apiCreateIncome(propertyId, {
       date: incomeDate,
       amount: Number(incomeAmount),
       source: incomeSource,
@@ -78,15 +77,13 @@ export default function PropertyDetailPage() {
   }
 
   async function handleDeleteIncome(id: number) {
-    if (!token) return;
-    await apiDeleteIncome(token, propertyId, id);
+    await apiDeleteIncome(propertyId, id);
     setIncomes((prev) => prev.filter((i) => i.id !== id));
   }
 
   async function handleAddExpense(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return;
-    const created = await apiCreateExpense(token, propertyId, {
+    const created = await apiCreateExpense(propertyId, {
       date: expenseDate,
       amount: Number(expenseAmount),
       category: expenseCategory,
@@ -97,12 +94,11 @@ export default function PropertyDetailPage() {
   }
 
   async function handleDeleteExpense(id: number) {
-    if (!token) return;
-    await apiDeleteExpense(token, propertyId, id);
+    await apiDeleteExpense(propertyId, id);
     setExpenses((prev) => prev.filter((e) => e.id !== id));
   }
 
-  if (!token || !property) return null;
+  if (!user || !property) return null;
 
   return (
     <>

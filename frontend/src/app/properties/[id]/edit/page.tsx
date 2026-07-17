@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function EditPropertyPage() {
-  const token = useAuthGuard();
+  const user = useAuthGuard();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const propertyId = Number(params.id);
@@ -24,23 +24,22 @@ export default function EditPropertyPage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-    apiGetProperty(token, propertyId).then((p) => {
+    if (!user) return;
+    apiGetProperty(propertyId).then((p) => {
       setName(p.name);
       setAddress(p.address);
       setPropertyType(p.property_type);
       setCurrency(p.currency);
       setLoaded(true);
     });
-  }, [token, propertyId]);
+  }, [user, propertyId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return;
     setError(null);
     setLoading(true);
     try {
-      await apiUpdateProperty(token, propertyId, {
+      await apiUpdateProperty(propertyId, {
         name,
         address,
         property_type: propertyType,
@@ -54,7 +53,7 @@ export default function EditPropertyPage() {
     }
   }
 
-  if (!token || !loaded) return null;
+  if (!user || !loaded) return null;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background">

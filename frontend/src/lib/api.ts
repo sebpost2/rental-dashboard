@@ -16,36 +16,45 @@ async function parseError(response: Response): Promise<string> {
   }
 }
 
+async function apiFetch(path: string, init: RequestInit = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: {
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...init.headers,
+    },
+  });
+  if (!response.ok) throw new ApiError(await parseError(response));
+  return response;
+}
+
 export type User = { id: number; email: string };
 
 export async function apiRegister(email: string, password: string): Promise<User> {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) throw new ApiError(await parseError(response));
-  return response.json();
+  return (
+    await apiFetch("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    })
+  ).json();
 }
 
-export async function apiLogin(email: string, password: string): Promise<string> {
+export async function apiLogin(email: string, password: string): Promise<void> {
   const body = new URLSearchParams({ username: email, password });
-  const response = await fetch(`${API_URL}/auth/login`, {
+  await apiFetch("/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
-  if (!response.ok) throw new ApiError(await parseError(response));
-  const data = await response.json();
-  return data.access_token as string;
 }
 
-export async function apiMe(token: string): Promise<User> {
-  const response = await fetch(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new ApiError(await parseError(response));
-  return response.json();
+export async function apiLogout(): Promise<void> {
+  await apiFetch("/auth/logout", { method: "POST" });
+}
+
+export async function apiMe(): Promise<User> {
+  return (await apiFetch("/auth/me")).json();
 }
 
 export type Property = {
@@ -63,33 +72,17 @@ export type PropertyInput = {
   currency: string;
 };
 
-async function authedFetch(token: string, path: string, init: RequestInit = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      ...(init.body ? { "Content-Type": "application/json" } : {}),
-      Authorization: `Bearer ${token}`,
-      ...init.headers,
-    },
-  });
-  if (!response.ok) throw new ApiError(await parseError(response));
-  return response;
+export async function apiListProperties(): Promise<Property[]> {
+  return (await apiFetch("/properties")).json();
 }
 
-export async function apiListProperties(token: string): Promise<Property[]> {
-  return (await authedFetch(token, "/properties")).json();
+export async function apiGetProperty(id: number): Promise<Property> {
+  return (await apiFetch(`/properties/${id}`)).json();
 }
 
-export async function apiGetProperty(token: string, id: number): Promise<Property> {
-  return (await authedFetch(token, `/properties/${id}`)).json();
-}
-
-export async function apiCreateProperty(
-  token: string,
-  input: PropertyInput
-): Promise<Property> {
+export async function apiCreateProperty(input: PropertyInput): Promise<Property> {
   return (
-    await authedFetch(token, "/properties", {
+    await apiFetch("/properties", {
       method: "POST",
       body: JSON.stringify(input),
     })
@@ -97,20 +90,19 @@ export async function apiCreateProperty(
 }
 
 export async function apiUpdateProperty(
-  token: string,
   id: number,
   input: Partial<PropertyInput>
 ): Promise<Property> {
   return (
-    await authedFetch(token, `/properties/${id}`, {
+    await apiFetch(`/properties/${id}`, {
       method: "PATCH",
       body: JSON.stringify(input),
     })
   ).json();
 }
 
-export async function apiDeleteProperty(token: string, id: number): Promise<void> {
-  await authedFetch(token, `/properties/${id}`, { method: "DELETE" });
+export async function apiDeleteProperty(id: number): Promise<void> {
+  await apiFetch(`/properties/${id}`, { method: "DELETE" });
 }
 
 export type Income = {
@@ -161,75 +153,61 @@ function dateRangeQuery(startDate?: string, endDate?: string): string {
 }
 
 export async function apiListIncome(
-  token: string,
   propertyId: number,
   startDate?: string,
   endDate?: string
 ): Promise<Income[]> {
   return (
-    await authedFetch(
-      token,
+    await apiFetch(
       `/properties/${propertyId}/incomes${dateRangeQuery(startDate, endDate)}`
     )
   ).json();
 }
 
 export async function apiCreateIncome(
-  token: string,
   propertyId: number,
   input: IncomeInput
 ): Promise<Income> {
   return (
-    await authedFetch(token, `/properties/${propertyId}/incomes`, {
+    await apiFetch(`/properties/${propertyId}/incomes`, {
       method: "POST",
       body: JSON.stringify(input),
     })
   ).json();
 }
 
-export async function apiDeleteIncome(
-  token: string,
-  propertyId: number,
-  incomeId: number
-): Promise<void> {
-  await authedFetch(token, `/properties/${propertyId}/incomes/${incomeId}`, {
+export async function apiDeleteIncome(propertyId: number, incomeId: number): Promise<void> {
+  await apiFetch(`/properties/${propertyId}/incomes/${incomeId}`, {
     method: "DELETE",
   });
 }
 
 export async function apiListExpenses(
-  token: string,
   propertyId: number,
   startDate?: string,
   endDate?: string
 ): Promise<Expense[]> {
   return (
-    await authedFetch(
-      token,
+    await apiFetch(
       `/properties/${propertyId}/expenses${dateRangeQuery(startDate, endDate)}`
     )
   ).json();
 }
 
 export async function apiCreateExpense(
-  token: string,
   propertyId: number,
   input: ExpenseInput
 ): Promise<Expense> {
   return (
-    await authedFetch(token, `/properties/${propertyId}/expenses`, {
+    await apiFetch(`/properties/${propertyId}/expenses`, {
       method: "POST",
       body: JSON.stringify(input),
     })
   ).json();
 }
 
-export async function apiDeleteExpense(
-  token: string,
-  propertyId: number,
-  expenseId: number
-): Promise<void> {
-  await authedFetch(token, `/properties/${propertyId}/expenses/${expenseId}`, {
+export async function apiDeleteExpense(propertyId: number, expenseId: number): Promise<void> {
+  await apiFetch(`/properties/${propertyId}/expenses/${expenseId}`, {
     method: "DELETE",
   });
 }
@@ -261,22 +239,16 @@ function reportQuery(filters: ReportFilters): string {
   return query ? `?${query}` : "";
 }
 
-export async function apiReportSummary(
-  token: string,
-  filters: ReportFilters
-): Promise<ReportSummary> {
-  return (await authedFetch(token, `/reports/summary${reportQuery(filters)}`)).json();
+export async function apiReportSummary(filters: ReportFilters): Promise<ReportSummary> {
+  return (await apiFetch(`/reports/summary${reportQuery(filters)}`)).json();
 }
 
 export async function apiReportTimeseries(
-  token: string,
   filters: ReportFilters
 ): Promise<TimeseriesPoint[]> {
-  return (
-    await authedFetch(token, `/reports/timeseries${reportQuery(filters)}`)
-  ).json();
+  return (await apiFetch(`/reports/timeseries${reportQuery(filters)}`)).json();
 }
 
-export async function apiExportCsv(token: string, filters: ReportFilters): Promise<Blob> {
-  return (await authedFetch(token, `/reports/export${reportQuery(filters)}`)).blob();
+export async function apiExportCsv(filters: ReportFilters): Promise<Blob> {
+  return (await apiFetch(`/reports/export${reportQuery(filters)}`)).blob();
 }

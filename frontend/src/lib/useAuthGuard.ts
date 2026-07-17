@@ -2,20 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getToken } from "@/lib/auth";
+import { apiMe, User } from "@/lib/api";
 
-export function useAuthGuard(): string | null {
+export function useAuthGuard(): User | null {
   const router = useRouter();
-  const [token, setTokenState] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const stored = getToken();
-    if (!stored) {
-      router.push("/login");
-      return;
-    }
-    setTokenState(stored);
+    apiMe()
+      .then(setUser)
+      .catch(() => {
+        router.push("/login");
+      });
   }, [router]);
 
-  return token;
+  return user;
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RooflineIcon } from "@/components/RooflineIcon";
-import { clearToken } from "@/lib/auth";
+import { apiLogout } from "@/lib/api";
 
 export function AppHeader({
   active,
@@ -14,8 +14,8 @@ export function AppHeader({
 }) {
   const router = useRouter();
 
-  function handleLogout() {
-    clearToken();
+  async function handleLogout() {
+    await apiLogout();
     router.push("/login");
   }
 

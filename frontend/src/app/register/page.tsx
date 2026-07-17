@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiLogin, apiRegister, ApiError } from "@/lib/api";
-import { setToken } from "@/lib/auth";
 import { RooflineIcon } from "@/components/RooflineIcon";
 
 export default function RegisterPage() {
@@ -24,8 +23,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await apiRegister(email, password);
-      const token = await apiLogin(email, password);
-      setToken(token);
+      await apiLogin(email, password);
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Error al crear la cuenta");
