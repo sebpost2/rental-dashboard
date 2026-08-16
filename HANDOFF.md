@@ -10,11 +10,11 @@
 
 - Email: `demo@rentalledger.com`
 - Password: `demopass123`
-- Cuenta sembrada con 2 propiedades y 5 meses de ingresos/gastos (ver "Re-sembrar datos demo" si se borran).
+- Cuenta sembrada con 1 propiedad y 3 meses de ingresos/gastos (ver "Re-sembrar datos demo" si se borran).
 
 ## Stack
 
-- **Backend**: FastAPI + SQLAlchemy + Alembic + PostgreSQL, auth JWT vía cookie `httpOnly`, rate limiting (slowapi), desplegado en Render (Docker, plan free).
+- **Backend**: FastAPI + SQLAlchemy + Alembic + PostgreSQL (Neon, vía Vercel Marketplace — Render Postgres free tier se borraba cada 30 días), auth JWT vía cookie `httpOnly`, rate limiting (slowapi), desplegado en Render (Docker, plan free).
 - **Frontend**: Next.js (App Router) + TypeScript + Tailwind v4 + shadcn/ui (variante "base", no Radix), desplegado en Vercel.
 - **Identidad visual**: "Blueprint Ledger" — ink-blue/blueprint-blue/brass/brick/paper, tipografía Space Grotesk (títulos) + Inter (UI) + IBM Plex Mono (todos los montos/fechas, tabular).
 
@@ -64,14 +64,13 @@ Conectado a GitHub (`sebpost2/rental-dashboard`, root `backend/`). Push a `main`
 
 ## Re-sembrar datos demo
 
-Si se borra la cuenta demo o los datos, correr contra el backend en producción:
+Si se borra la cuenta demo o los datos (o se recrea la base de datos), correr desde `backend/` con `DATABASE_URL` apuntando a la base correcta:
 
 ```bash
-BASE=https://rental-dashboard-mvjm.onrender.com
-curl -X POST $BASE/auth/register -H "Content-Type: application/json" \
-  -d '{"email":"demo@rentalledger.com","password":"demopass123"}'
-# luego crear propiedades + ingresos/gastos vía POST /properties, /properties/{id}/incomes, /properties/{id}/expenses
+python -m scripts.seed_demo
 ```
+
+Crea la cuenta demo (si no existe) y una propiedad con 3 meses de ingresos/gastos. Es idempotente: si la cuenta demo ya tiene propiedades, no hace nada.
 
 ## Fases completadas (todas)
 
