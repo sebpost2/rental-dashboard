@@ -13,3 +13,8 @@ build/
 .mypy_cache/
 .coverage
 htmlcov/
+
+# Local scratch, never committed
+.playwright-mcp/
+drag-test.png
+frontend/skills-lock.json
