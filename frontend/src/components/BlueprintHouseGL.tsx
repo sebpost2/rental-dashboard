@@ -149,7 +149,7 @@ export function BlueprintHouseGL() {
         className="pointer-events-none absolute top-6 left-1/2 z-10 -translate-x-1/2 rounded-sm px-2.5 py-1 font-mono text-[11px] font-semibold tracking-[0.04em] whitespace-nowrap"
         style={{ background: "var(--brass)", color: "var(--ink)" }}
       >
-        NETO +$2,140
+        NETO +2,140.00
       </div>
       <Canvas
         shadows
