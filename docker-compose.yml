@@ -19,6 +19,7 @@ services:
     build: ./backend
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/rental_dashboard
+      JWT_SECRET: local-dev-secret-change-me
     ports:
       - "8000:8000"
     depends_on:
