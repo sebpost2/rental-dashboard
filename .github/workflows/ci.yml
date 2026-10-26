@@ -19,7 +19,8 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r requirements.txt
       # The tests swap the database for in-memory SQLite (tests/conftest.py); only the JWT secret is required.
-      - run: pytest -q
+      # python -m puts backend/ on sys.path so the tests can import `app`.
+      - run: python -m pytest -q
         env:
           JWT_SECRET: test
 
