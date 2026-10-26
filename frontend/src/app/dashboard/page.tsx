@@ -61,13 +61,14 @@ export default function DashboardPage() {
     apiReportTimeseries(filters).then(setTimeseries);
   }, [user, propertyId, startDate, endDate]);
 
-  const cumulativeTrend = useMemo(() => {
-    let running = 0;
-    return timeseries.map((t) => {
-      running += t.income - t.expenses;
-      return { period: t.period, cumulative: running };
-    });
-  }, [timeseries]);
+  const cumulativeTrend = useMemo(
+    () =>
+      timeseries.reduce<{ period: string; cumulative: number }[]>(
+        (acc, t) => [...acc, { period: t.period, cumulative: (acc.at(-1)?.cumulative ?? 0) + t.income - t.expenses }],
+        [],
+      ),
+    [timeseries],
+  );
 
   async function handleExport() {
     const blob = await apiExportCsv({

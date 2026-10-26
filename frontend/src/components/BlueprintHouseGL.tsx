@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Edges, Grid, ContactShadows, Environment } from "@react-three/drei";
 import * as THREE from "three";
@@ -9,18 +10,6 @@ const W = 3.2;
 const D = 2.0;
 const H = 1.9;
 const ROOF_RISE = 1.05;
-
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-}
 
 function useRoofGeometry() {
   return useMemo(() => {
